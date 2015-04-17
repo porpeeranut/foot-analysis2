@@ -1,19 +1,16 @@
 package com.porpeeranut.footanalysis2;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,6 +25,8 @@ public class MainActivity extends ActionBarActivity {
     Activity act;
     ImageView imageView;
     Bitmap siden;
+    Bitmap sideup;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,8 @@ public class MainActivity extends ActionBarActivity {
         btnRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                imageView.setImageBitmap(siden);
 
+                Dip.findmark(siden);
                 /*Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                 Uri fileUri = getOutputMediaFileUri();
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);  // set the image file name
@@ -54,7 +53,9 @@ public class MainActivity extends ActionBarActivity {
         });
 
         siden = BitmapFactory.decodeResource(getResources(), R.drawable.siden);
-        Bitmap sideup = BitmapFactory.decodeResource(getResources(), R.drawable.sideup);
+        siden = Bitmap.createScaledBitmap(siden, siden.getWidth() / 5, siden.getHeight() / 5, false);
+        sideup = BitmapFactory.decodeResource(getResources(), R.drawable.sideup);
+        sideup = Bitmap.createScaledBitmap(sideup, sideup.getWidth() / 5, sideup.getHeight() / 5, false);
         imageView.setImageBitmap(siden);
     }
 
@@ -88,6 +89,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
         }
+
+
     }
 
     private static Uri getOutputMediaFileUri(){
