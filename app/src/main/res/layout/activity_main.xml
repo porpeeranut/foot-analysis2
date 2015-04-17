@@ -10,7 +10,7 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/btnRec"
         android:id="@+id/imageView"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter" />
 
     <Button
         android:id="@+id/btnRec"

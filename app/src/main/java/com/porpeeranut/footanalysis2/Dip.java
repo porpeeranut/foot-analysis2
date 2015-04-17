@@ -12,6 +12,8 @@ import java.util.ArrayList;
  */
 public class Dip {
 
+    public static double TH = 0.7;
+
     public static void bit2mat(Bitmap in, double[][] out) {
         int h = in.getHeight();
         int w = in.getWidth();
@@ -30,14 +32,12 @@ public class Dip {
                 double b = B / 255.0;
 
                 out[i][j] = 2*g - r - b;
-
+                out[i][j] = Math.max(out[i][j],0);
                 mx = Math.max(out[i][j], mx);
                 mn = Math.min(out[i][j], mn);
 
             }
         }
-
-        norm(out, mn, mx);
     }
 
     public static ArrayList<Point> findmark(Bitmap im) {
@@ -47,7 +47,7 @@ public class Dip {
         double[][] mat = new double[h][w];
 
         bit2mat(im,mat);
-        bwimageth(mat, 0.7, mat);
+        bwimageth(mat, TH, mat);
 
         //dilate(mat, 4);
         //dilate(mat, 4);
@@ -55,19 +55,68 @@ public class Dip {
         int[][] label = new int[h][w];
 
         int c = find_components(mat, label);
+        Log.e("compo",c+"");
         ArrayList<Point> res = new ArrayList<Point>();
         double[][] tmp = new double[h][w];
-        for (int i=1;i<=c;i++) {
-            bwimagev(label, i, tmp);
-            int m00 = moment(tmp,0,0);
-            int m01 = moment(tmp,0,1);
-            int m10 = moment(tmp,1,0);
-            Point p = new Point();
-            p.set(m01/m00, m10/m00);
-            Log.e("Pos"+i, (m10/m00)+" "+(m01/m00));
-            res.add(p);
-        }
+        int m1 = 0;
+        int m2 = 0;
+        int m3 = 0;
+        Point p1 = new Point();
+        Point p2 = new Point();
+        Point p3 = new Point();
+        if (c < 50) {
+            for (int i=1;i<=c;i++) {
+                bwimagev(label, i, tmp);
+                int m00 = moment(tmp,0,0);
+                int m01 = moment(tmp,0,1);
+                int m10 = moment(tmp,1,0);
+                if (m00>m1) {
+                    p3.set(p2.x,p2.y);
+                    m3 = m2;
+                    p2.set(p1.x,p1.y);
+                    m2 = m1;
+                    p1.set(m01/m00, m10/m00);
+                    m1 = m00;
+                }
+                else if (m00>m2) {
+                    p3.set(p2.x,p2.y);
+                    m3 = m2;
+                    p2.set(m01/m00, m10/m00);
+                    m2 = m00;
+                }
+                else if (m00>m3) {
+                    p3.set(m01 / m00, m10 / m00);
+                    m3 = m00;
+                }
+            }
+            Log.e("position1", p1.x+" "+p1.y);
+            Log.e("position2", p2.x+" "+p2.y);
+            Log.e("position3", p3.x+" "+p3.y);
+            res.add(p1);
+            res.add(p2);
+            res.add(p3);
+        } else
+            Log.v("error", "c > 50");
         return res;
+    }
+
+    public static Bitmap findmark2(Bitmap im) {
+        int h = im.getHeight();
+        int w = im.getWidth();
+        Log.e("size", h+" "+w);
+        double[][] mat = new double[h][w];
+
+        bit2mat(im,mat);
+        bwimageth(mat, TH, mat);
+
+        //dilate(mat, 4);
+        //dilate(mat, 4);
+
+        int[][] label = new int[h][w];
+
+        int c = find_components(mat, label);
+        Log.e("eiei", c+"");
+        return mat2bit(mat);
     }
 
     public static Bitmap mat2bit(double[][] mat) {
